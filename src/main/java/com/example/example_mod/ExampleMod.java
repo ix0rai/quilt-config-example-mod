@@ -5,14 +5,30 @@ import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintStream;
+
 public class ExampleMod implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod name as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger("Example Mod");
+	public static final String MOD_ID = "quilt_config_example_mod";
 
 	@Override
 	public void onInitialize(ModContainer mod) {
-		LOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
+		ExampleModConfig config = ExampleModConfig.INSTANCE;
+
+		if (config.print.value()) {
+			for (int i = 0; i < config.timesToPrint.value(); i++) {
+				PrintStream stream = config.advancedSettings.printStream.value().getStream();
+				String message = config.message.value();
+				for (var entry : config.replacements.value()) {
+					message = message.replace(entry.getKey(), entry.getValue());
+				}
+
+				if (config.advancedSettings.printNewlines.value()) {
+					stream.println(config.message.value());
+				} else {
+					stream.print(config.message.value());
+				}
+			}
+		}
 	}
 }
